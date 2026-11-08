@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-planner-service
+  namespace: nethra
+  labels: { app: ai-planner-service, platform: nethra-travel-ai }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: ai-planner-service } }
+  template:
+    metadata: { labels: { app: ai-planner-service } }
+    spec:
+      containers:
+      - name: ai-planner-service
+        image: nethra/ai-planner-service:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports: [{ containerPort: 8089 }]
+        env:
+        - { name: BUDGET_SERVICE_URL, value: "http://budget-service:8082" }
+        - { name: DESTINATION_SERVICE_URL, value: "http://destination-service:8083" }
+        - { name: TRANSPORT_SERVICE_URL, value: "http://transport-service:8084" }
+        - { name: HOTEL_SERVICE_URL, value: "http://hotel-service:8085" }
+        - { name: ACTIVITY_SERVICE_URL, value: "http://activity-service:8086" }
+        - { name: PARTNER_SERVICE_URL, value: "http://partner-service:8087" }
+        - { name: ITINERARY_SERVICE_URL, value: "http://itinerary-service:8088" }
+        - { name: NOTIFICATION_SERVICE_URL, value: "http://notification-service:8090" }
+        readinessProbe: { httpGet: { path: /actuator/health, port: 8089 }, initialDelaySeconds: 20, periodSeconds: 10 }
+        resources: { requests: { cpu: "100m", memory: "256Mi" }, limits: { cpu: "500m", memory: "512Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-planner-service
+  namespace: nethra
+  labels: { app: ai-planner-service }
+spec:
+  type: ClusterIP
+  selector: { app: ai-planner-service }
+  ports: [{ port: 8089, targetPort: 8089 }]

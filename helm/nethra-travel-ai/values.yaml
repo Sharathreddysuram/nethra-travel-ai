@@ -1,0 +1,15 @@
+imageTag: 1.0.0
+namespace: nethra
+services:
+  - { name: api-gateway, port: 8080, replicas: 1 }
+  - { name: user-service, port: 8081, replicas: 1 }
+  - { name: budget-service, port: 8082, replicas: 1 }
+  - { name: destination-service, port: 8083, replicas: 1 }
+  - { name: transport-service, port: 8084, replicas: 1 }
+  - { name: hotel-service, port: 8085, replicas: 1 }
+  - { name: activity-service, port: 8086, replicas: 1 }
+  - { name: partner-service, port: 8087, replicas: 1 }
+  - { name: itinerary-service, port: 8088, replicas: 1 }
+  - { name: ai-planner-service, port: 8089, replicas: 1 }
+  - { name: notification-service, port: 8090, replicas: 1 }
+frontend: { port: 80, replicas: 1 }

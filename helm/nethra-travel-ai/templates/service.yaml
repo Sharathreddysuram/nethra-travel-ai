@@ -1,0 +1,19 @@
+{{- range .Values.services }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  labels: { app: {{ .name }} }
+spec:
+  type: ClusterIP
+  selector: { app: {{ .name }} }
+  ports: [{ port: {{ .port }}, targetPort: {{ .port }} }]
+---
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata: { name: frontend, labels: { app: frontend } }
+spec:
+  type: ClusterIP
+  selector: { app: frontend }
+  ports: [{ port: 80, targetPort: 80 }]

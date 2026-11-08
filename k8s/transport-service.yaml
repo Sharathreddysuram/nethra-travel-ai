@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transport-service
+  namespace: nethra
+  labels: { app: transport-service, platform: nethra-travel-ai }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: transport-service } }
+  template:
+    metadata: { labels: { app: transport-service } }
+    spec:
+      containers:
+      - name: transport-service
+        image: nethra/transport-service:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports: [{ containerPort: 8084 }]
+
+        readinessProbe: { httpGet: { path: /actuator/health, port: 8084 }, initialDelaySeconds: 20, periodSeconds: 10 }
+        resources: { requests: { cpu: "100m", memory: "256Mi" }, limits: { cpu: "500m", memory: "512Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transport-service
+  namespace: nethra
+  labels: { app: transport-service }
+spec:
+  type: ClusterIP
+  selector: { app: transport-service }
+  ports: [{ port: 8084, targetPort: 8084 }]

@@ -1,0 +1,9 @@
+package ai.nethra.hotel.provider;
+import ai.nethra.common.*; import org.springframework.stereotype.Component; import java.math.BigDecimal; import java.math.RoundingMode; import java.util.*;
+@Component public class MockHotelProvider implements HotelProvider {
+  private record Template(String suffix,String area,int stars,double multiplier,String rating,boolean breakfast,boolean cancellation) {}
+  private static final List<Template> TEMPLATES=List.of(new Template("Budget Nest","Old Town",2,0.70,"3.9",false,true),new Template("Residency Comfort","Station Road",3,0.88,"4.2",true,true),new Template("Grand","City Centre",4,1.10,"4.5",true,true),new Template("Retreat & Spa","Prime Tourist District",4,1.30,"4.6",true,false),new Template("Heritage Collection","Premium Quarter",5,1.78,"4.8",true,true));
+  public List<Hotel> hotels(String destinationId){ DestinationProfile d=TravelCatalog.find(destinationId).orElseThrow(() -> new IllegalArgumentException("Unknown destination: " + destinationId)); List<Hotel> out=new ArrayList<>();
+    for(int i=0;i<TEMPLATES.size();i++){ Template t=TEMPLATES.get(i); BigDecimal price=Moneys.rupees(d.hotelBasePerNight().multiply(BigDecimal.valueOf(t.multiplier()*(0.96+i*0.03)))); BigDecimal rating=new BigDecimal(t.rating()); BigDecimal value=rating.multiply(BigDecimal.valueOf(16)).subtract(price.divide(d.hotelBasePerNight(),4,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(6))).add(t.breakfast()?BigDecimal.valueOf(4):BigDecimal.ZERO).add(t.cancellation()?BigDecimal.valueOf(3):BigDecimal.ZERO); if(value.compareTo(BigDecimal.valueOf(100))>0)value=BigDecimal.valueOf(100); if(value.signum()<0)value=BigDecimal.ZERO; out.add(new Hotel(d.id()+"-hotel-"+(i+1),d.id(),d.hubCity()+" "+t.suffix(),t.area(),t.stars(),price,rating,value.setScale(1,RoundingMode.HALF_UP),t.breakfast(),t.cancellation())); }
+    out.sort(Comparator.comparing(Hotel::valueScore).reversed()); return out; }
+}

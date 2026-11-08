@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: budget-service
+  namespace: nethra
+  labels: { app: budget-service, platform: nethra-travel-ai }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: budget-service } }
+  template:
+    metadata: { labels: { app: budget-service } }
+    spec:
+      containers:
+      - name: budget-service
+        image: nethra/budget-service:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports: [{ containerPort: 8082 }]
+
+        readinessProbe: { httpGet: { path: /actuator/health, port: 8082 }, initialDelaySeconds: 20, periodSeconds: 10 }
+        resources: { requests: { cpu: "100m", memory: "256Mi" }, limits: { cpu: "500m", memory: "512Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: budget-service
+  namespace: nethra
+  labels: { app: budget-service }
+spec:
+  type: ClusterIP
+  selector: { app: budget-service }
+  ports: [{ port: 8082, targetPort: 8082 }]

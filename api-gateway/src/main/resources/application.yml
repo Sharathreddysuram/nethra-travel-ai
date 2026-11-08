@@ -1,0 +1,26 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]': { allowedOrigins: ["http://localhost:3000", "http://localhost:5173"], allowedMethods: "*", allowedHeaders: "*", allowCredentials: true }
+      routes:
+        - { id: user-service, uri: "${USER_SERVICE_URL:http://localhost:8081}", predicates: ["Path=/api/users/**"] }
+        - { id: budget-service, uri: "${BUDGET_SERVICE_URL:http://localhost:8082}", predicates: ["Path=/api/budget/**"] }
+        - { id: destination-service, uri: "${DESTINATION_SERVICE_URL:http://localhost:8083}", predicates: ["Path=/api/destinations/**"] }
+        - { id: transport-service, uri: "${TRANSPORT_SERVICE_URL:http://localhost:8084}", predicates: ["Path=/api/transport/**"] }
+        - { id: hotel-service, uri: "${HOTEL_SERVICE_URL:http://localhost:8085}", predicates: ["Path=/api/hotels/**"] }
+        - { id: activity-service, uri: "${ACTIVITY_SERVICE_URL:http://localhost:8086}", predicates: ["Path=/api/activities/**"] }
+        - { id: partner-service, uri: "${PARTNER_SERVICE_URL:http://localhost:8087}", predicates: ["Path=/api/partners/**"] }
+        - { id: itinerary-service, uri: "${ITINERARY_SERVICE_URL:http://localhost:8088}", predicates: ["Path=/api/itineraries/**"] }
+        - { id: ai-planner-service, uri: "${AI_PLANNER_SERVICE_URL:http://localhost:8089}", predicates: ["Path=/ai/**"] }
+        - { id: notification-service, uri: "${NOTIFICATION_SERVICE_URL:http://localhost:8090}", predicates: ["Path=/api/notifications/**"] }
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

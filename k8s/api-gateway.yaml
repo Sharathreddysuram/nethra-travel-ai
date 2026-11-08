@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: nethra
+  labels: { app: api-gateway, platform: nethra-travel-ai }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: api-gateway } }
+  template:
+    metadata: { labels: { app: api-gateway } }
+    spec:
+      containers:
+      - name: api-gateway
+        image: nethra/api-gateway:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports: [{ containerPort: 8080 }]
+        env:
+        - { name: USER_SERVICE_URL, value: "http://user-service:8081" }
+        - { name: BUDGET_SERVICE_URL, value: "http://budget-service:8082" }
+        - { name: DESTINATION_SERVICE_URL, value: "http://destination-service:8083" }
+        - { name: TRANSPORT_SERVICE_URL, value: "http://transport-service:8084" }
+        - { name: HOTEL_SERVICE_URL, value: "http://hotel-service:8085" }
+        - { name: ACTIVITY_SERVICE_URL, value: "http://activity-service:8086" }
+        - { name: PARTNER_SERVICE_URL, value: "http://partner-service:8087" }
+        - { name: ITINERARY_SERVICE_URL, value: "http://itinerary-service:8088" }
+        - { name: AI_PLANNER_SERVICE_URL, value: "http://ai-planner-service:8089" }
+        - { name: NOTIFICATION_SERVICE_URL, value: "http://notification-service:8090" }
+        readinessProbe: { httpGet: { path: /actuator/health, port: 8080 }, initialDelaySeconds: 20, periodSeconds: 10 }
+        resources: { requests: { cpu: "100m", memory: "256Mi" }, limits: { cpu: "500m", memory: "512Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: nethra
+  labels: { app: api-gateway }
+spec:
+  type: ClusterIP
+  selector: { app: api-gateway }
+  ports: [{ port: 8080, targetPort: 8080 }]

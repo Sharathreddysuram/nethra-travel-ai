@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: partner-service
+  namespace: nethra
+  labels: { app: partner-service, platform: nethra-travel-ai }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: partner-service } }
+  template:
+    metadata: { labels: { app: partner-service } }
+    spec:
+      containers:
+      - name: partner-service
+        image: nethra/partner-service:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports: [{ containerPort: 8087 }]
+
+        readinessProbe: { httpGet: { path: /actuator/health, port: 8087 }, initialDelaySeconds: 20, periodSeconds: 10 }
+        resources: { requests: { cpu: "100m", memory: "256Mi" }, limits: { cpu: "500m", memory: "512Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: partner-service
+  namespace: nethra
+  labels: { app: partner-service }
+spec:
+  type: ClusterIP
+  selector: { app: partner-service }
+  ports: [{ port: 8087, targetPort: 8087 }]

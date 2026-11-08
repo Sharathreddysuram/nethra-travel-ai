@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: itinerary-service
+  namespace: nethra
+  labels: { app: itinerary-service, platform: nethra-travel-ai }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: itinerary-service } }
+  template:
+    metadata: { labels: { app: itinerary-service } }
+    spec:
+      containers:
+      - name: itinerary-service
+        image: nethra/itinerary-service:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports: [{ containerPort: 8088 }]
+
+        readinessProbe: { httpGet: { path: /actuator/health, port: 8088 }, initialDelaySeconds: 20, periodSeconds: 10 }
+        resources: { requests: { cpu: "100m", memory: "256Mi" }, limits: { cpu: "500m", memory: "512Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: itinerary-service
+  namespace: nethra
+  labels: { app: itinerary-service }
+spec:
+  type: ClusterIP
+  selector: { app: itinerary-service }
+  ports: [{ port: 8088, targetPort: 8088 }]

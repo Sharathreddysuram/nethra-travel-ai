@@ -1,0 +1,85 @@
+# Nethra Travel AI — full platform compose (mock providers, embedded H2 by default)
+services:
+  api-gateway:
+    build: { context: ., dockerfile: api-gateway/Dockerfile }
+    image: nethra/api-gateway:1.0.0
+    container_name: nethra-api-gateway
+    ports: ["8080:8080"]
+    environment:
+      USER_SERVICE_URL: http://user-service:8081
+      BUDGET_SERVICE_URL: http://budget-service:8082
+      DESTINATION_SERVICE_URL: http://destination-service:8083
+      TRANSPORT_SERVICE_URL: http://transport-service:8084
+      HOTEL_SERVICE_URL: http://hotel-service:8085
+      ACTIVITY_SERVICE_URL: http://activity-service:8086
+      PARTNER_SERVICE_URL: http://partner-service:8087
+      ITINERARY_SERVICE_URL: http://itinerary-service:8088
+      AI_PLANNER_SERVICE_URL: http://ai-planner-service:8089
+      NOTIFICATION_SERVICE_URL: http://notification-service:8090
+    depends_on: [user-service, budget-service, destination-service, transport-service, hotel-service, activity-service, partner-service, itinerary-service, ai-planner-service, notification-service]
+  user-service:
+    build: { context: ., dockerfile: user-service/Dockerfile }
+    image: nethra/user-service:1.0.0
+    container_name: nethra-user-service
+    ports: ["8081:8081"]
+  budget-service:
+    build: { context: ., dockerfile: budget-service/Dockerfile }
+    image: nethra/budget-service:1.0.0
+    container_name: nethra-budget-service
+    ports: ["8082:8082"]
+  destination-service:
+    build: { context: ., dockerfile: destination-service/Dockerfile }
+    image: nethra/destination-service:1.0.0
+    container_name: nethra-destination-service
+    ports: ["8083:8083"]
+  transport-service:
+    build: { context: ., dockerfile: transport-service/Dockerfile }
+    image: nethra/transport-service:1.0.0
+    container_name: nethra-transport-service
+    ports: ["8084:8084"]
+  hotel-service:
+    build: { context: ., dockerfile: hotel-service/Dockerfile }
+    image: nethra/hotel-service:1.0.0
+    container_name: nethra-hotel-service
+    ports: ["8085:8085"]
+  activity-service:
+    build: { context: ., dockerfile: activity-service/Dockerfile }
+    image: nethra/activity-service:1.0.0
+    container_name: nethra-activity-service
+    ports: ["8086:8086"]
+  partner-service:
+    build: { context: ., dockerfile: partner-service/Dockerfile }
+    image: nethra/partner-service:1.0.0
+    container_name: nethra-partner-service
+    ports: ["8087:8087"]
+  itinerary-service:
+    build: { context: ., dockerfile: itinerary-service/Dockerfile }
+    image: nethra/itinerary-service:1.0.0
+    container_name: nethra-itinerary-service
+    ports: ["8088:8088"]
+  ai-planner-service:
+    build: { context: ., dockerfile: ai-planner-service/Dockerfile }
+    image: nethra/ai-planner-service:1.0.0
+    container_name: nethra-ai-planner-service
+    ports: ["8089:8089"]
+    environment:
+      BUDGET_SERVICE_URL: http://budget-service:8082
+      DESTINATION_SERVICE_URL: http://destination-service:8083
+      TRANSPORT_SERVICE_URL: http://transport-service:8084
+      HOTEL_SERVICE_URL: http://hotel-service:8085
+      ACTIVITY_SERVICE_URL: http://activity-service:8086
+      PARTNER_SERVICE_URL: http://partner-service:8087
+      ITINERARY_SERVICE_URL: http://itinerary-service:8088
+      NOTIFICATION_SERVICE_URL: http://notification-service:8090
+    depends_on: [budget-service, destination-service, transport-service, hotel-service, activity-service, partner-service, itinerary-service, notification-service]
+  notification-service:
+    build: { context: ., dockerfile: notification-service/Dockerfile }
+    image: nethra/notification-service:1.0.0
+    container_name: nethra-notification-service
+    ports: ["8090:8090"]
+  frontend:
+    build: { context: ./frontend, dockerfile: Dockerfile }
+    image: nethra/frontend:1.0.0
+    container_name: nethra-frontend
+    ports: ["3000:80"]
+    depends_on: [api-gateway]
